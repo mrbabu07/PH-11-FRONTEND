@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { auth } from "../Firebase/Firebase.config";
 import { FaEye, FaHome, FaGoogle, FaLock, FaEnvelope, FaUser, FaImage } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
+import axios from "axios";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -22,22 +23,20 @@ const Register = () => {
 
   const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
+  // Upload image to ImgBB
   const handleImageUpload = async () => {
     if (!imageFile) return "";
     const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("upload_preset", "YOUR_CLOUDINARY_UPLOAD_PRESET"); // Replace with your preset
-    formData.append("cloud_name", "YOUR_CLOUDINARY_CLOUD_NAME"); // Replace with your cloud name
+    formData.append("image", imageFile);
 
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_CLOUD_NAME/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      return data.secure_url;
+      const res = await axios.post(
+        "https://api.imgbb.com/1/upload?key=c2caab6a740c87821a7d96195c7f7cf3",
+        formData
+      );
+      return res.data.data.display_url;
     } catch (err) {
-      toast.error("Image upload failed. Try again.");
+      toast.error("Image upload failed. Skipping image.");
       return "";
     }
   };
@@ -46,44 +45,72 @@ const Register = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const name = e.target.name.value.trim();
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value.trim();
 
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters long.");
+    if (!email || !password) {
+      toast.error("Email and password are required.");
       setIsLoading(false);
       return;
     }
 
-    const photoURL = await handleImageUpload();
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      setIsLoading(false);
+      return;
+    }
 
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((result) =>
-        updateProfile(result.user, {
-          displayName: name,
-          photoURL: photoURL,
-        })
-      )
-      .then(() => {
-        toast.success("Account created successfully!");
-        navigate("/");
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      })
-      .finally(() => setIsLoading(false));
+    try {
+      const photoURL = await handleImageUpload();
+
+      // Firebase registration
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(result.user, { displayName: name, photoURL });
+
+      // Save user to backend
+      await axios.post("http://localhost:5000/users", {
+        name,
+        email,
+        password, // optional: usually not stored plaintext
+        photoURL,
+        // role: "buyer",
+        createdAt: new Date(),
+      });
+
+      toast.success("Account created successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Registration failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleRegister = () => {
+  const handleGoogleRegister = async () => {
     setIsLoading(true);
-    signInWithPopup(auth, googleProvider)
-      .then(() => {
-        toast.success("Welcome!");
-        navigate("/");
-      })
-      .catch(() => toast.error("Google sign-in failed."))
-      .finally(() => setIsLoading(false));
+    try {
+      const googleRes = await signInWithPopup(auth, googleProvider);
+      const user = googleRes.user;
+
+      // Save Google user to backend
+      await axios.post("http://localhost:5000/users", {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+        role: "buyer",
+        createdAt: new Date(),
+      });
+
+      toast.success("Welcome!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Google sign-in failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -91,9 +118,7 @@ const Register = () => {
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-6 text-center">
-          <div className="flex items-center justify-center mb-3">
-            <FaHome className="text-white text-2xl mr-2" />
-          </div>
+          <FaHome className="text-white text-3xl mx-auto mb-3" />
           <h2 className="text-2xl font-bold text-white">Create Account</h2>
           <p className="text-blue-100 mt-1">Join our community</p>
         </div>
@@ -103,117 +128,89 @@ const Register = () => {
           <form onSubmit={handleRegistration} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Full Name
-              </label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
               <div className="relative">
-                <FaUser className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none" />
+                <FaUser className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="text"
                   name="name"
-                  placeholder="Enter your full name"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter your full name"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Email Address
-              </label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
               <div className="relative">
-                <FaEnvelope className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none" />
+                <FaEnvelope className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="email"
                   name="email"
-                  placeholder="Enter your email"
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter your email"
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Password
-              </label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password</label>
               <div className="relative">
-                <FaLock className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none" />
+                <FaLock className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type={isPasswordVisible ? "text" : "password"}
                   name="password"
-                  placeholder="Enter a strong password"
                   required
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  placeholder="Enter a strong password"
+                  className="w-full pl-10 pr-12 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-3 text-gray-400"
                 >
-                  {isPasswordVisible ? <IoEyeOff className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                  {isPasswordVisible ? <IoEyeOff /> : <FaEye />}
                 </button>
               </div>
             </div>
 
             {/* Profile Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Profile Image (optional)
-              </label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Profile Image (optional)</label>
               <div className="relative">
-                <FaImage className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none" />
+                <FaImage className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files[0])}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
                 />
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-700 to-teal-500 hover:from-blue-500 hover:to-teal-600 text-white py-3 px-4 rounded-lg font-semibold shadow-md hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:transform-none disabled:hover:shadow-md"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
             >
               {isLoading ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-            <span className="mx-3 text-sm text-gray-500 dark:text-gray-400">Or continue with</span>
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
-          </div>
+          <div className="my-6 text-center text-gray-500">OR</div>
 
-          {/* Google */}
           <button
             onClick={handleGoogleRegister}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 font-medium shadow-md hover:shadow-lg transition-all duration-200"
+            className="w-full flex items-center justify-center gap-3 border py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
           >
-            <FaGoogle className="text-red-500" />
-            Continue with Google
+            <FaGoogle className="text-red-500" /> Continue with Google
           </button>
-
-          {/* Login link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Already have an account?{" "}
-              <button
-                onClick={() => navigate("/login")}
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold transition-colors"
-              >
-                Sign in here
-              </button>
-            </p>
-          </div>
         </div>
       </div>
     </div>
