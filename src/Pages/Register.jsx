@@ -9,7 +9,15 @@ import {
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { auth } from "../Firebase/Firebase.config";
-import { FaEye, FaHome, FaGoogle, FaLock, FaEnvelope, FaUser, FaImage } from "react-icons/fa";
+import {
+  FaEye,
+  FaHome,
+  FaGoogle,
+  FaLock,
+  FaEnvelope,
+  FaUser,
+  FaImage,
+} from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
 import axios from "axios";
 
@@ -21,7 +29,8 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
-  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+  const togglePasswordVisibility = () =>
+    setIsPasswordVisible(!isPasswordVisible);
 
   // Upload image to ImgBB
   const handleImageUpload = async () => {
@@ -48,6 +57,8 @@ const Register = () => {
     const name = e.target.name.value.trim();
     const email = e.target.email.value.trim();
     const password = e.target.password.value.trim();
+    const role = e.target.role.value;
+    
 
     if (!email || !password) {
       toast.error("Email and password are required.");
@@ -65,7 +76,11 @@ const Register = () => {
       const photoURL = await handleImageUpload();
 
       // Firebase registration
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       await updateProfile(result.user, { displayName: name, photoURL });
 
       // Save user to backend
@@ -74,7 +89,7 @@ const Register = () => {
         email,
         password, // optional: usually not stored plaintext
         photoURL,
-        // role: "buyer",
+        role,
         createdAt: new Date(),
       });
 
@@ -128,7 +143,9 @@ const Register = () => {
           <form onSubmit={handleRegistration} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                Full Name
+              </label>
               <div className="relative">
                 <FaUser className="absolute left-3 top-3 text-gray-400" />
                 <input
@@ -143,7 +160,9 @@ const Register = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                Email Address
+              </label>
               <div className="relative">
                 <FaEnvelope className="absolute left-3 top-3 text-gray-400" />
                 <input
@@ -155,10 +174,18 @@ const Register = () => {
                 />
               </div>
             </div>
+            <select name="role" className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700" defaultValue="Choose a Role" className="select">
+              <option disabled={true}>Choose a role</option>
+              
+              <option value='user'>User</option>
+              <option value='manager'>Manager</option>
+            </select>
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Password</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                Password
+              </label>
               <div className="relative">
                 <FaLock className="absolute left-3 top-3 text-gray-400" />
                 <input
@@ -180,7 +207,9 @@ const Register = () => {
 
             {/* Profile Image */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Profile Image (optional)</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
+                Profile Image (optional)
+              </label>
               <div className="relative">
                 <FaImage className="absolute left-3 top-3 text-gray-400" />
                 <input

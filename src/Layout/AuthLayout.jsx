@@ -1,10 +1,14 @@
 // src/layout/AuthLayout.jsx
 import React from "react";
 import { Outlet } from "react-router";
+import Navbar from "../Components/Navbar";
 
 const AuthLayout = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+    <div>
+      <Navbar />
+
+    {/* // <div className="min-h-screen flex items-center justify-center bg-gray-900"> */}
       <Outlet />
     </div>
   );
