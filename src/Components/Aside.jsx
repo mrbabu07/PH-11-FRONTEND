@@ -19,6 +19,10 @@ export default function Aside() {
           Add Products
         </NavItem>
 
+        <NavItem to="/dashboard/manage-product" icon={<Package size={18} />}>
+          Manage Products
+        </NavItem>
+
         <NavItem to="/dashboard/users" icon={<Users size={18} />}>
           Users
         </NavItem>

@@ -8,6 +8,7 @@ import ErrorPage from "../Pages/ErrorPage"; // create this
 import DashboardLayout from "../Dashboard/DashboardLayout";
 import MainDashboard from "../Dashboard/MainDashboard";
 import AddProduct from "../Dashboard/AddProduct/AddProduct";
+import ManageProduct from "../Dashboard/ManageProduct/ManageProduct";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: 'add-product',
         element: <AddProduct />
+      },
+      {
+        path: 'manage-product',
+        element: <ManageProduct />
       },
     ]
   }

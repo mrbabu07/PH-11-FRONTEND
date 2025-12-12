@@ -1,5 +1,5 @@
 // src/Pages/Register.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -25,14 +25,37 @@ const googleProvider = new GoogleAuthProvider();
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
+  const [district, setDistrict] = useState("");
+  const [upazila, setUpazila] = useState("");
+
+  const [districts, setDistricts] = useState([]);
+  const [upazilas, setUpazilas] = useState([]);
+
+  // Load districts and upazilas
+  useEffect(() => {
+    axios
+      .get("/district.json")
+      .then((res) => {
+        if (res.data && res.data.districts) setDistricts(res.data.districts);
+      })
+      .catch((err) => console.error("District load error:", err));
+
+    axios
+      .get("/upazila.json")
+      .then((res) => {
+        if (res.data && res.data.upazilas) setUpazilas(res.data.upazilas);
+      })
+      .catch((err) => console.error("Upazila load error:", err));
+  }, []);
+
   const togglePasswordVisibility = () =>
     setIsPasswordVisible(!isPasswordVisible);
 
-  // Upload image to ImgBB
   const handleImageUpload = async () => {
     if (!imageFile) return "";
     const formData = new FormData();
@@ -45,7 +68,7 @@ const Register = () => {
       );
       return res.data.data.display_url;
     } catch (err) {
-      toast.error("Image upload failed. Skipping image.");
+      toast.error("Image upload failed.");
       return "";
     }
   };
@@ -57,11 +80,10 @@ const Register = () => {
     const name = e.target.name.value.trim();
     const email = e.target.email.value.trim();
     const password = e.target.password.value.trim();
-    const role = e.target.role.value;
-    
+    const blood = e.target.blood.value;
 
-    if (!email || !password) {
-      toast.error("Email and password are required.");
+    if (!name || !email || !password || !blood || !district || !upazila) {
+      toast.error("Please fill all fields.");
       setIsLoading(false);
       return;
     }
@@ -76,27 +98,24 @@ const Register = () => {
       const photoURL = await handleImageUpload();
 
       // Firebase registration
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const result = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(result.user, { displayName: name, photoURL });
 
       // Save user to backend
       await axios.post("http://localhost:5000/users", {
         name,
         email,
-        password, // optional: usually not stored plaintext
+        password,
+        blood,
+        district,
+        upazila,
         photoURL,
-        role,
         createdAt: new Date(),
       });
 
-      toast.success("Account created successfully!");
+      toast.success("Account created!");
       navigate("/");
     } catch (err) {
-      console.error(err);
       toast.error(err.message || "Registration failed.");
     } finally {
       setIsLoading(false);
@@ -109,114 +128,163 @@ const Register = () => {
       const googleRes = await signInWithPopup(auth, googleProvider);
       const user = googleRes.user;
 
-      // Save Google user to backend
       await axios.post("http://localhost:5000/users", {
         name: user.displayName,
         email: user.email,
+        blood: "",
+        district: "",
+        upazila: "",
         photoURL: user.photoURL,
-        role: "buyer",
         createdAt: new Date(),
       });
 
       toast.success("Welcome!");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      toast.error("Google sign-in failed.");
+      toast.error("Google login failed.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 dark:from-gray-900 dark:to-blue-900 p-4">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-teal-500 p-6 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-teal-50 p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border overflow-hidden">
+        <div className="bg-blue-600 p-6 text-center">
           <FaHome className="text-white text-3xl mx-auto mb-3" />
           <h2 className="text-2xl font-bold text-white">Create Account</h2>
-          <p className="text-blue-100 mt-1">Join our community</p>
+          <p className="text-blue-100">Join our blood donor community</p>
         </div>
 
-        {/* Form */}
         <div className="p-8">
           <form onSubmit={handleRegistration} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                Full Name
-              </label>
+              <label className="block mb-1">Full Name</label>
               <div className="relative">
                 <FaUser className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="text"
                   name="name"
                   required
-                  placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter your name"
+                  className="w-full pl-10 pr-3 py-3 border rounded-lg"
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                Email Address
-              </label>
+              <label className="block mb-1">Email</label>
               <div className="relative">
                 <FaEnvelope className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="email"
                   name="email"
                   required
-                  placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter email"
+                  className="w-full pl-10 pr-3 py-3 border rounded-lg"
                 />
               </div>
             </div>
-            <select name="role" className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700" defaultValue="Choose a Role" className="select">
-              <option disabled={true}>Choose a role</option>
-              
-              <option value='user'>User</option>
-              <option value='manager'>Manager</option>
-            </select>
+
+            {/* Blood Group */}
+            <div>
+              <label className="block mb-1">Blood Group</label>
+              <select
+                name="blood"
+                required
+                defaultValue=""
+                className="w-full py-3 px-4 border rounded-lg"
+              >
+                <option value="" disabled>
+                  Select Blood Group
+                </option>
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
+                  (g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+
+            {/* District */}
+            <div>
+              <label className="block mb-1">District</label>
+              <select
+                name="district"
+                required
+                value={district}
+                onChange={(e) => {
+                  setDistrict(e.target.value);
+                  setUpazila("");
+                }}
+                className="w-full py-3 px-4 border rounded-lg"
+              >
+                <option value="">Select District</option>
+                {districts.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Upazila */}
+            <div>
+              <label className="block mb-1">Upazila</label>
+              <select
+                name="upazila"
+                required
+                value={upazila}
+                onChange={(e) => setUpazila(e.target.value)}
+                className="w-full py-3 px-4 border rounded-lg"
+              >
+                <option value="">Select Upazila</option>
+                {upazilas
+                  .filter((u) => u.district_id === district)
+                  .map((u) => (
+                    <option key={u.id} value={u.name}>
+                      {u.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                Password
-              </label>
+              <label className="block mb-1">Password</label>
               <div className="relative">
                 <FaLock className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type={isPasswordVisible ? "text" : "password"}
                   name="password"
                   required
-                  placeholder="Enter a strong password"
-                  className="w-full pl-10 pr-12 py-3 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter password"
+                  className="w-full pl-10 pr-12 py-3 border rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-3 text-gray-400"
+                  className="absolute right-3 top-3"
                 >
                   {isPasswordVisible ? <IoEyeOff /> : <FaEye />}
                 </button>
               </div>
             </div>
 
-            {/* Profile Image */}
+            {/* Image */}
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">
-                Profile Image (optional)
-              </label>
+              <label className="block mb-1">Profile Image (optional)</label>
               <div className="relative">
                 <FaImage className="absolute left-3 top-3 text-gray-400" />
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files[0])}
-                  className="w-full pl-10 py-2 border rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full pl-10 py-2 border rounded-lg"
                 />
               </div>
             </div>
@@ -224,19 +292,18 @@ const Register = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold"
             >
-              {isLoading ? "Creating Account..." : "Create Account"}
+              {isLoading ? "Creating..." : "Create Account"}
             </button>
           </form>
 
-          {/* Divider */}
           <div className="my-6 text-center text-gray-500">OR</div>
 
           <button
             onClick={handleGoogleRegister}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 border py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
+            className="w-full flex items-center justify-center gap-3 border py-3 rounded-lg"
           >
             <FaGoogle className="text-red-500" /> Continue with Google
           </button>

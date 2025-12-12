@@ -1,8 +1,12 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import toast from "react-hot-toast";
+import { AuthContext } from "../../Context/AuthProvider";
+
+
 
 const AddProduct = () => {
+   const {user} = useContext(AuthContext) 
   const [formData, setFormData] = useState({
     productName: "",
     description: "",
@@ -12,66 +16,70 @@ const AddProduct = () => {
     minOrder: "",
     payment: "",
     showHome: false,
-    imageUrls: [], // store uploaded image URLs
+    imageUrls: [], // uploaded image URLs
+    managerEmail: user?.email || "",
   });
+
+  
+  
+
   const [images, setImages] = useState([]);
   const categories = ["T-Shirt", "Panjabi", "Hoodie", "Denim", "Women's Wear"];
 
-  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Toggle show on homepage
   const handleToggle = () => {
     setFormData((prev) => ({ ...prev, showHome: !prev.showHome }));
   };
 
-  // Handle image selection
   const handleImageChange = (e) => {
     setImages(Array.from(e.target.files));
   };
 
   // Upload images to ImgBB
   const uploadImages = async () => {
-    const uploadedUrls = [];
+    const urls = [];
     for (const img of images) {
       const data = new FormData();
       data.append("image", img);
-
       try {
         const res = await axios.post(
           "https://api.imgbb.com/1/upload?key=c2caab6a740c87821a7d96195c7f7cf3",
           data
         );
-        uploadedUrls.push(res.data.data.display_url);
+        urls.push(res.data.data.display_url);
       } catch (err) {
-        toast.error("Failed to upload an image.");
+        toast.error("Image upload failed for one file.");
       }
     }
-    return uploadedUrls;
+    return urls;
   };
 
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (images.length === 0) {
+    if (!images.length) {
       toast.error("Please select at least one image.");
       return;
     }
 
     const urls = await uploadImages();
+    if (!urls.length) return;
 
-    if (urls.length === 0) return;
-
-    // Prepare final product data
-    const productData = { ...formData, imageUrls: urls };
+    const finalData = {
+      ...formData,
+      price: parseInt(formData.price),
+      quantity: parseInt(formData.quantity),
+      minOrder: parseInt(formData.minOrder),
+      imageUrls: urls,
+    };
 
     try {
-      await axios.post("http://localhost:5000/products", productData);
+      await axios.post("http://localhost:5000/products", finalData);
       toast.success("Product added successfully!");
+      // reset form
       setFormData({
         productName: "",
         description: "",
@@ -93,7 +101,6 @@ const AddProduct = () => {
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow">
       <h2 className="text-2xl font-semibold mb-6">Add New Product</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
-
         {/* Product Name */}
         <div>
           <label className="block font-medium mb-1">Product Name</label>
@@ -133,7 +140,9 @@ const AddProduct = () => {
           >
             <option value="">Select Category</option>
             {categories.map((c, idx) => (
-              <option key={idx} value={c}>{c}</option>
+              <option key={idx} value={c}>
+                {c}
+              </option>
             ))}
           </select>
         </div>
@@ -152,7 +161,7 @@ const AddProduct = () => {
           />
         </div>
 
-        {/* Available Quantity */}
+        {/* Quantity */}
         <div>
           <label className="block font-medium mb-1">Available Quantity</label>
           <input
@@ -166,7 +175,7 @@ const AddProduct = () => {
           />
         </div>
 
-        {/* Minimum Order Quantity */}
+        {/* Minimum Order */}
         <div>
           <label className="block font-medium mb-1">Minimum Order Quantity</label>
           <input
@@ -175,12 +184,12 @@ const AddProduct = () => {
             value={formData.minOrder}
             onChange={handleChange}
             className="w-full border px-3 py-2 rounded"
-            placeholder="Minimum order amount"
+            placeholder="Minimum order"
             required
           />
         </div>
 
-        {/* Payment Option */}
+        {/* Payment */}
         <div>
           <label className="block font-medium mb-1">Payment Option</label>
           <select
