@@ -7,11 +7,10 @@ import AuthLayout from "../Layout/AuthLayout";
 import ErrorPage from "../Pages/ErrorPage"; // create this
 import DashboardLayout from "../Dashboard/DashboardLayout";
 import MainDashboard from "../Dashboard/MainDashboard";
-
-import ManageProduct from "../Dashboard/ManageProduct/ManageProduct";
 import AddRequest from "../Dashboard/AddProduct/AddRequest";
 import AllUsers from "../Dashboard/AllUsers/AllUsers";
 import PrivateRoute from "./PrivateRoute";
+import MyRequest from "../Dashboard/MyRequest/MyRequest";
 
 const router = createBrowserRouter([
   {
@@ -34,27 +33,32 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: 'dashboard',
-    element:(<PrivateRoute> <DashboardLayout ></DashboardLayout></PrivateRoute>),
+    path: "dashboard",
+    element: (
+      <PrivateRoute>
+        {" "}
+        <DashboardLayout></DashboardLayout>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: '/dashboard',
-        element: <MainDashboard />
+        path: "/dashboard",
+        element: <MainDashboard />,
       },
       {
-        path: 'add-request',
-        element: <AddRequest />
+        path: "add-request",
+        element: <AddRequest />,
       },
       {
-        path: 'manage-product',
-        element: <ManageProduct />
+        path: "my-request",
+        element: <MyRequest />,
       },
       {
-        path: 'all-users',
-        element: <AllUsers/>
-      }
-    ]
-  }
+        path: "all-users",
+        element: <AllUsers />,
+      },
+    ],
+  },
 ]);
 
 export default router;

@@ -29,8 +29,8 @@ export default function Aside() {
         </NavItem>)
         }
 
-        <NavItem to="/dashboard/manage-product" icon={<Package size={18} />}>
-          Manage Donor
+        <NavItem to="/dashboard/my-request" icon={<Package size={18} />}>
+        My Request
         </NavItem>
 
         {
