@@ -1,7 +1,15 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Users, Package, Home, LogOut } from "lucide-react";
+import { useContext } from "react";
+import { AuthContext } from "../Context/AuthProvider";
+import { signOut } from "firebase/auth";
+import { auth } from "../Firebase/Firebase.config";
 
 export default function Aside() {
+  const {role} = useContext(AuthContext)
+  const handleLogOut = () => {
+    signOut(auth)
+  }
   return (
     <aside className="w-64 h-screen bg-gray-900 text-gray-100 flex flex-col">
       {/* Logo */}
@@ -15,17 +23,23 @@ export default function Aside() {
           Dashboard
         </NavItem>
 
-        <NavItem to="/dashboard/add-request" icon={<Package size={18} />}>
+        {
+          role == 'donor' && (<NavItem to="/dashboard/add-request" icon={<Package size={18} />}>
           Add Request
-        </NavItem>
+        </NavItem>)
+        }
 
         <NavItem to="/dashboard/manage-product" icon={<Package size={18} />}>
           Manage Donor
         </NavItem>
 
-        <NavItem to="/dashboard/all-users" icon={<Users size={18} />}>
+        {
+          role == 'admin' && (
+            <NavItem to="/dashboard/all-users" icon={<Users size={18} />}>
           All Users
         </NavItem>
+          )
+        }
 
         <NavItem to="/" icon={<Home size={18} />}>
           Back to Home
@@ -34,7 +48,7 @@ export default function Aside() {
 
       {/* Logout */}
       <div className="p-4 border-t border-gray-800">
-        <button className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700">
+        <button onClick={handleLogOut} className="flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700">
           <LogOut size={18} />
           Logout
         </button>

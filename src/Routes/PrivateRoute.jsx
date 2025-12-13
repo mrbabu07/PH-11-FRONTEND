@@ -4,8 +4,8 @@ import { useContext } from "react";
 import { AuthContext } from "../Context/AuthProvider";
 
 const PrivateRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-  if(loading){
+  const { user, loading, roleLoading } = useContext(AuthContext);
+  if(loading || roleLoading){
     return <p>loading...</p>
   }
 

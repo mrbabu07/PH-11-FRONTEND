@@ -9,6 +9,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(true);
   const [role, setRole] = useState(null);
 
   // Fetch user role from backend
@@ -17,6 +18,7 @@ const AuthProvider = ({ children }) => {
       const response = await axios.get(`http://localhost:5000/users/role/${email}`);
       if (response.data) {
         setRole(response.data.role || null);
+        setRoleLoading(false)
         console.log(`User ${email} has role:`, response.data.role);
       } else {
         setRole(null);
@@ -43,7 +45,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, role, fetchUserRole }}>
+    <AuthContext.Provider value={{ user, loading, role, fetchUserRole, roleLoading }}>
       {children}
     </AuthContext.Provider>
   );
