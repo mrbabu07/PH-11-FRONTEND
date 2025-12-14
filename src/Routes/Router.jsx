@@ -14,6 +14,8 @@ import MyRequest from "../Dashboard/MyRequest/MyRequest";
 import DonationRequest from "../Pages/Donate/DonationRequest";
 import DonationRequestDetails from "../Pages/Donate/DonationRequestDetails";
 import Funding from "../Pages/Funding/Funding";
+import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
+import PaymentFailed from "../Pages/PaymentFailed/PaymentFailed";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,14 @@ const router = createBrowserRouter([
       {
         path: "donation-request",
         element: <DonationRequest />,
+      },
+      {
+        path: "/payment-success",
+        element: <PaymentSuccess />,
+      },
+      {
+        path: "/payment-failed",
+        element: <PaymentFailed />,
       },
       {
         path: "/donation-request/:id",
