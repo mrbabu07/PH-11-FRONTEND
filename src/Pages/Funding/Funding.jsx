@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 function Funding() {
   const axios = useAxios();
   const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
+  
 
   const handleCheckout = (e) => {
     e.preventDefault();

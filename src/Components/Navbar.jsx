@@ -26,6 +26,9 @@ const Navbar = () => {
           <li>
             <Link to={"/donation-request"}>Donation Requests</Link>
           </li>
+          <li>
+            <Link to={"/search"}>Search</Link>
+          </li>
 
           {user && (
             <li>
