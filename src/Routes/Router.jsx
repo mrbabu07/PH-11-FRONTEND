@@ -21,6 +21,7 @@ import MyRequest from "../Dashboard/MyRequest/MyRequest";
 
 import PrivateRoute from "./PrivateRoute";
 import AllUsers from "../Dashboard/AllUsers/AllUsers";
+import Profile from "../Dashboard/Profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -66,7 +67,9 @@ const router = createBrowserRouter([
       { path: "my-request", element: <MyRequest /> },
       { path: "donation-request", element: <DonationRequest /> },
       { path: "all-users", element: <AllUsers /> },
-      { path: "funding", element: <Funding /> }
+      { path: "funding", element: <Funding /> },
+      { path: "profile", element: <Profile /> }
+      
       
     ],
   },

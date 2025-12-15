@@ -65,6 +65,10 @@ export default function Aside() {
           </>
         )}
 
+        <NavItem to="/dashboard/profile" icon={<Home size={18} />}>
+          Profile
+        </NavItem>
+
         <NavItem to="/" icon={<Home size={18} />}>
           Back to Home
         </NavItem>
