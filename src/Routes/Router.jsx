@@ -1,59 +1,42 @@
-// src/Routes/router.jsx
-import { createBrowserRouter } from "react-router-dom"; // make sure it's react-router-dom
+// src/Routes/Router.jsx
+import { createBrowserRouter } from "react-router-dom";
+import MainLayout from "../Layout/MainLayout";
+import AuthLayout from "../Layout/AuthLayout";
+import ErrorPage from "../Pages/ErrorPage";
+import Home from "../Pages/Home";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
-import Home from "../Pages/Home";
-import AuthLayout from "../Layout/AuthLayout";
-import ErrorPage from "../Pages/ErrorPage"; // create this
+import DonationRequest from "../Pages/Donate/DonationRequest";
+import SearchRequest from "../Pages/SearchPage/SearchRequest";
+import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
+import PaymentFailed from "../Pages/PaymentFailed/PaymentFailed";
+import DonationRequestDetails from "../Pages/Donate/DonationRequestDetails";
+import Funding from "../Pages/Funding/Funding";
+
+// Dashboard
 import DashboardLayout from "../Dashboard/DashboardLayout";
 import MainDashboard from "../Dashboard/MainDashboard";
 import AddRequest from "../Dashboard/AddProduct/AddRequest";
-import AllUsers from "../Dashboard/AllUsers/AllUsers";
-import PrivateRoute from "./PrivateRoute";
 import MyRequest from "../Dashboard/MyRequest/MyRequest";
-import DonationRequest from "../Pages/Donate/DonationRequest";
-import DonationRequestDetails from "../Pages/Donate/DonationRequestDetails";
-import Funding from "../Pages/Funding/Funding";
-import PaymentSuccess from "../Pages/PaymentSuccess/PaymentSuccess";
-import PaymentFailed from "../Pages/PaymentFailed/PaymentFailed";
-import SearchRequest from "../Pages/SearchPage/SearchRequest";
+
+import PrivateRoute from "./PrivateRoute";
+import AllUsers from "../Dashboard/AllUsers/AllUsers";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AuthLayout />,
-    errorElement: <ErrorPage />, // handle errors & 404
+    element: <MainLayout />,
+    errorElement: <ErrorPage />,
     children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "donation-request", element: <DonationRequest /> },
+      { path: "search", element: <SearchRequest /> },
+      { path: "payment-success", element: <PaymentSuccess /> },
+      { path: "payment-failed", element: <PaymentFailed /> },
       {
-        index: true, // this means path="/" for the home page
-        element: <Home />,
-      },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "donation-request",
-        element: <DonationRequest />,
-      },
-      {
-        path: "/payment-success",
-        element: <PaymentSuccess />,
-      },
-      {
-        path: "/payment-failed",
-        element: <PaymentFailed />,
-      },
-      {
-        path: "/search",
-        element: <SearchRequest/>,
-      },
-      {
-        path: "/donation-request/:id",
+        path: "donation-request/:id",
         element: (
           <PrivateRoute>
             <DonationRequestDetails />
@@ -61,10 +44,10 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/funding",
+        path: "funding",
         element: (
           <PrivateRoute>
-            <Funding></Funding>
+            <Funding />
           </PrivateRoute>
         ),
       },
@@ -74,27 +57,17 @@ const router = createBrowserRouter([
     path: "dashboard",
     element: (
       <PrivateRoute>
-        {" "}
-        <DashboardLayout></DashboardLayout>
+        <DashboardLayout />
       </PrivateRoute>
     ),
     children: [
-      {
-        path: "/dashboard",
-        element: <MainDashboard />,
-      },
-      {
-        path: "add-request",
-        element: <AddRequest />,
-      },
-      {
-        path: "my-request",
-        element: <MyRequest />,
-      },
-      {
-        path: "all-users",
-        element: <AllUsers />,
-      },
+      { index: true, element: <MainDashboard /> },
+      { path: "add-request", element: <AddRequest /> },
+      { path: "my-request", element: <MyRequest /> },
+      { path: "donation-request", element: <DonationRequest /> },
+      { path: "all-users", element: <AllUsers /> },
+      // আপনার স্ট্রাকচারে AllUsers আছে, কিন্তু ManageProduct নেই
+      // তাই এখন শুধু donor রুট রাখা হলো
     ],
   },
 ]);
