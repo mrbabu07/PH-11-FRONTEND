@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import Aside from '../Components/Aside';
+import Footer from '../Components/Footer';
 
 const DashboardLayout = () => {
     return (
@@ -10,7 +11,7 @@ const DashboardLayout = () => {
             className='flex-1 p-5'>
                 <Outlet></Outlet>
             </div>
-            
+            <Footer></Footer>
         </div>
     );
 };

@@ -66,8 +66,8 @@ const router = createBrowserRouter([
       { path: "my-request", element: <MyRequest /> },
       { path: "donation-request", element: <DonationRequest /> },
       { path: "all-users", element: <AllUsers /> },
-      // আপনার স্ট্রাকচারে AllUsers আছে, কিন্তু ManageProduct নেই
-      // তাই এখন শুধু donor রুট রাখা হলো
+      { path: "funding", element: <Funding /> }
+      
     ],
   },
 ]);

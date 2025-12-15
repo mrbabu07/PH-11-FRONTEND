@@ -5,7 +5,6 @@ const AllUsers = () => {
   const axiosSecure = useAxiosSecure();
   const [users, setUsers] = useState([]);
 
-  // fetch all users
   const fetchUsers = async () => {
     try {
       const res = await axiosSecure.get("/users");
@@ -15,24 +14,31 @@ const AllUsers = () => {
     }
   };
 
-  // load users on page load
   useEffect(() => {
     fetchUsers();
   }, [axiosSecure]);
 
-  // update user status
+  // Update user status (block/unblock)
   const handleStatusChange = async (email, status) => {
     try {
       const res = await axiosSecure.patch(
         `/update/user/status?email=${email}&status=${status}`
       );
-
       if (res.data?.modifiedCount > 0) {
-        // 🔁 refresh users without reload
         fetchUsers();
       }
     } catch (err) {
       console.error("Status update failed:", err);
+    }
+  };
+
+  // 🔹 NEW: Update user role (donor → volunteer / admin)
+  const handleRoleChange = async (email, newRole) => {
+    try {
+      await axiosSecure.patch("/users/role", { email, newRole });
+      fetchUsers(); // refresh list
+    } catch (err) {
+      console.error("Role update failed:", err);
     }
   };
 
@@ -77,25 +83,44 @@ const AllUsers = () => {
               <td>{user?.status}</td>
 
               <td>
-                {user?.status !== "active" ? (
-                  <button
-                    onClick={() =>
-                      handleStatusChange(user.email, "active")
-                    }
-                    className="btn btn-ghost btn-xs"
-                  >
-                    Activate
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      handleStatusChange(user.email, "blocked")
-                    }
-                    className="btn btn-error btn-xs"
-                  >
-                    Block
-                  </button>
-                )}
+                <div className="flex flex-wrap gap-1">
+                  {/* Block / Unblock */}
+                  {user?.status !== "active" ? (
+                    <button
+                      onClick={() => handleStatusChange(user.email, "active")}
+                      className="btn btn-ghost btn-xs"
+                    >
+                      Activate
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleStatusChange(user.email, "blocked")}
+                      className="btn btn-error btn-xs"
+                    >
+                      Block
+                    </button>
+                  )}
+
+                  {/* Make Volunteer — only for donors */}
+                  {user?.role === "donor" && (
+                    <button
+                      onClick={() => handleRoleChange(user.email, "volunteer")}
+                      className="btn btn-warning btn-xs"
+                    >
+                      Make Volunteer
+                    </button>
+                  )}
+
+                  {/* Make Admin — for donor or volunteer */}
+                  {user?.role !== "admin" && (
+                    <button
+                      onClick={() => handleRoleChange(user.email, "admin")}
+                      className="btn btn-error btn-xs"
+                    >
+                      Make Admin
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}
