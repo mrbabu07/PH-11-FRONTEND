@@ -106,12 +106,16 @@ const DonationRequestDetails = () => {
 
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold">Blood Group:</span>
-            <span className="badge badge-error">{request.blood_group || "N/A"}</span>
+            <span className="badge badge-error">
+              {request.blood_group || "N/A"}
+            </span>
           </div>
 
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold">Location:</span>
-            <span>{request.district}, {request.upazila}</span>
+            <span>
+              {request.district}, {request.upazila}
+            </span>
           </div>
 
           <div className="flex justify-between border-b pb-2">
@@ -121,7 +125,9 @@ const DonationRequestDetails = () => {
 
           <div className="flex justify-between border-b pb-2">
             <span className="font-semibold">Address:</span>
-            <span className="text-sm text-gray-600">{request.address || "N/A"}</span>
+            <span className="text-sm text-gray-600">
+              {request.address || "N/A"}
+            </span>
           </div>
 
           <div className="flex justify-between border-b pb-2">
@@ -161,10 +167,7 @@ const DonationRequestDetails = () => {
           {/* Donate Button (only for pending requests and logged-in users) */}
           {request.donation_status === "pending" && user && (
             <div className="pt-4 text-center">
-              <button
-                onClick={handleDonate}
-                className="btn btn-primary"
-              >
+              <button onClick={handleDonate} className="btn btn-primary">
                 Donate Now
               </button>
             </div>
@@ -172,13 +175,60 @@ const DonationRequestDetails = () => {
         </div>
       </div>
 
+      {/* Action Buttons for Donor */}
+      {user && request.donation_status === "inprogress" && (
+        <div className="pt-4 flex justify-center gap-3">
+          <button
+            onClick={async () => {
+              try {
+                await axiosSecure.patch(
+                  `/donation-request/${id}/update-status`,
+                  {
+                    donation_status: "done",
+                  }
+                );
+                setRequest((prev) => ({ ...prev, donation_status: "done" }));
+                toast.success("Donation marked as done!");
+              } catch (err) {
+                toast.error("Failed to update status");
+              }
+            }}
+            className="btn btn-success"
+          >
+            Mark as Done
+          </button>
+          <button
+            onClick={async () => {
+              try {
+                await axiosSecure.patch(
+                  `/donation-request/${id}/update-status`,
+                  {
+                    donation_status: "canceled",
+                  }
+                );
+                setRequest((prev) => ({
+                  ...prev,
+                  donation_status: "canceled",
+                }));
+                toast.success("Donation canceled");
+              } catch (err) {
+                toast.error("Failed to cancel donation");
+              }
+            }}
+            className="btn btn-error"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
       {/* Confirmation Modal */}
       {isModalOpen && (
         <div className="modal modal-open">
           <div className="modal-box">
             <h3 className="font-bold text-lg">Confirm Your Donation</h3>
             <p className="py-4">
-              You are about to confirm your willingness to donate blood for this request.
+              You are about to confirm your willingness to donate blood for this
+              request.
             </p>
 
             <div className="space-y-3 mb-4">
