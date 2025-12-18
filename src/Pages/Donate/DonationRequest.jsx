@@ -17,7 +17,7 @@
 //     const fetchRequests = async () => {
 //       setLoading(true);
 //       try {
-//         const res = await axios.get(`/donation-requests?status=pending&page=${currentPage}&size=8`);
+//         const res = await axios.get(`/donation-request?status=pending&page=${currentPage}&size=8`);
 //         setRequests(res.data.requests);
 //         setTotalPages(res.data.totalPages);
 //       } catch (err) {
@@ -164,7 +164,7 @@ const DonationRequest = () => {
     const fetchRequests = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/donation-requests?status=pending&page=${currentPage}&size=8`);
+        const res = await axios.get(`/donation-request?status=pending&page=${currentPage}&size=8`);
         setRequests(res.data.requests);
         setTotalPages(res.data.totalPages);
       } catch (err) {

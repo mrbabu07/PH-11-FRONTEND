@@ -200,7 +200,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-white mb-1">Emergency Hotline</p>
-                  <p className="text-red-400">+880 17XX-XXXXXX</p>
+                  <p className="text-red-400">+880 1521721946</p>
                 </div>
               </motion.li>
               <motion.li
@@ -212,7 +212,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-white mb-1">Email</p>
-                  <p>contact@bloodbridge.org</p>
+                  <p>contact@bloodbridge.org <br />
+                  mdjahedulislamjaved@gmail.com</p>
                 </div>
               </motion.li>
               <motion.li
@@ -224,7 +225,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="font-semibold text-white mb-1">Location</p>
-                  <p>Dhaka, Bangladesh</p>
+                  <p>Chittagong, Bangladesh</p>
                 </div>
               </motion.li>
             </ul>

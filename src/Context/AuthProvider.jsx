@@ -16,7 +16,9 @@ export const AuthProvider = ({ children }) => {
       setUser(currentUser);
       if (currentUser?.email) {
         try {
-          const res = await axios.get(`http://localhost:5000/users/role/${currentUser.email}`);
+          const res = await axios.get(
+            `https://ph-11-backend-mocha.vercel.app/users/role/${currentUser.email}`
+          );
           if (res.data) {
             setRole(res.data.role || "donor");
             setUserStatus(res.data.status || "active");

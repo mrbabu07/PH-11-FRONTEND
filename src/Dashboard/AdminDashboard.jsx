@@ -128,7 +128,7 @@ const AdminDashboard = () => {
         const [usersRes, fundingRes, requestsRes] = await Promise.all([
           axiosSecure.get("/users"),
           axiosSecure.get("/funding/summary"),
-          axiosSecure.get("/donation-requests?field=count"),
+          axiosSecure.get("/donation-request?field=count"),
         ]);
 
         setStats({

@@ -6,11 +6,10 @@
 // function Funding() {
 //   const axios = useAxios();
 //   const { user } = useContext(AuthContext);
-  
 
 //   const handleCheckout = (e) => {
 //     e.preventDefault();
-    
+
 //     const donorEmail = user?.email;
 //     const donateAmount = e.target.donateAmount.value;
 //     const donorName = user?.displayName;
@@ -21,12 +20,11 @@
 //       donorName
 //     };
 
-    
 //     axios
-//       .post('http://localhost:5000/create-payment-checkout', formData)
+//       .post('https://ph-11-backend-mocha.vercel.app/create-payment-checkout', formData)
 //       .then(res => {
 //         const { url } = res.data;
-        
+
 //         if (url) {
 //           window.location.href = url;
 //         }
@@ -60,19 +58,18 @@
 
 // export default Funding;
 
-
-import React, { useContext } from 'react';
-import useAxios from '../../hooks/useAxios';
-import { AuthContext } from '../../Context/AuthProvider';
-import { useNavigate } from 'react-router';
+import React, { useContext } from "react";
+import useAxios from "../../hooks/useAxios";
+import { AuthContext } from "../../Context/AuthProvider";
+import { useNavigate } from "react-router";
 
 function Funding() {
   const axios = useAxios();
   const { user } = useContext(AuthContext);
-  
+
   const handleCheckout = (e) => {
     e.preventDefault();
-    
+
     const donorEmail = user?.email;
     const donateAmount = e.target.donateAmount.value;
     const donorName = user?.displayName;
@@ -80,19 +77,22 @@ function Funding() {
     const formData = {
       donorEmail,
       donateAmount,
-      donorName
+      donorName,
     };
 
     axios
-      .post('http://localhost:5000/create-payment-checkout', formData)
-      .then(res => {
+      .post(
+        "https://ph-11-backend-mocha.vercel.app/create-payment-checkout",
+        formData
+      )
+      .then((res) => {
         const { url } = res.data;
-        
+
         if (url) {
           window.location.href = url;
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Payment error:", err.response?.data || err.message);
       });
   };
@@ -123,8 +123,12 @@ function Funding() {
                   {user?.displayName?.charAt(0).toUpperCase() || "?"}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-800">{user?.displayName || "Guest"}</p>
-                  <p className="text-sm text-gray-600">{user?.email || "No email"}</p>
+                  <p className="font-semibold text-gray-800">
+                    {user?.displayName || "Guest"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {user?.email || "No email"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -148,12 +152,14 @@ function Funding() {
 
             {/* Quick Amount Buttons */}
             <div className="grid grid-cols-4 gap-2">
-              {[100, 500, 1000, 5000].map(amount => (
+              {[100, 500, 1000, 5000].map((amount) => (
                 <button
                   key={amount}
                   type="button"
                   onClick={(e) => {
-                    const input = e.target.closest('form').querySelector('input[name="donateAmount"]');
+                    const input = e.target
+                      .closest("form")
+                      .querySelector('input[name="donateAmount"]');
                     input.value = amount;
                   }}
                   className="px-3 py-2 bg-green-100 text-green-700 font-semibold rounded-lg hover:bg-green-200 transition-colors text-sm"
@@ -164,8 +170,8 @@ function Funding() {
             </div>
 
             {/* Submit Button */}
-            <button 
-              className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold text-lg rounded-xl hover:shadow-xl transform hover:scale-105 transition-all" 
+            <button
+              className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white font-bold text-lg rounded-xl hover:shadow-xl transform hover:scale-105 transition-all"
               type="submit"
             >
               🎁 Proceed to Payment

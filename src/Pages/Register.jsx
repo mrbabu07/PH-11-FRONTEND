@@ -101,7 +101,7 @@
 //       await updateProfile(result.user, { displayName: name, photoURL });
 
 //       // Save user to backend
-//       await axios.post("http://localhost:5000/users", {
+//       await axios.post("https://ph-11-backend-mocha.vercel.app/users", {
 //         name,
 //         email,
 //         password,
@@ -127,7 +127,7 @@
 //       const googleRes = await signInWithPopup(auth, googleProvider);
 //       const user = googleRes.user;
 
-//       await axios.post("http://localhost:5000/users", {
+//       await axios.post("https://ph-11-backend-mocha.vercel.app/users", {
 //         name: user.displayName,
 //         email: user.email,
 //         blood: "",
@@ -314,7 +314,6 @@
 
 // export default Register;
 
-
 import React, { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
@@ -428,11 +427,15 @@ const Register = () => {
       const photoURL = await handleImageUpload();
 
       // Firebase registration
-      const result = await createUserWithEmailAndPassword(auth, email, password);
+      const result = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       await updateProfile(result.user, { displayName: name, photoURL });
 
       // Save user to backend
-      await axios.post("http://localhost:5000/users", {
+      await axios.post("https://ph-11-backend-mocha.vercel.app/users", {
         name,
         email,
         password,
@@ -458,7 +461,7 @@ const Register = () => {
       const googleRes = await signInWithPopup(auth, googleProvider);
       const user = googleRes.user;
 
-      await axios.post("http://localhost:5000/users", {
+      await axios.post("https://ph-11-backend-mocha.vercel.app/users", {
         name: user.displayName,
         email: user.email,
         blood: "",
@@ -486,15 +489,15 @@ const Register = () => {
             key={i}
             className="absolute text-red-200 opacity-20"
             initial={{ y: -100, x: `${i * 25}%` }}
-            animate={{ 
+            animate={{
               y: "110vh",
-              rotate: 360
+              rotate: 360,
             }}
             transition={{
               duration: 20 + i * 3,
               repeat: Infinity,
               ease: "linear",
-              delay: i * 1.5
+              delay: i * 1.5,
             }}
           >
             <Droplet size={30 + i * 8} fill="currentColor" />
@@ -502,26 +505,29 @@ const Register = () => {
         ))}
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         className="max-w-md w-full bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-red-100 overflow-hidden relative z-10"
       >
         {/* Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 p-8 text-center relative overflow-hidden"
         >
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-            }}></div>
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            ></div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4, type: "spring" }}
@@ -534,12 +540,16 @@ const Register = () => {
             </div>
           </motion.div>
 
-          <h2 className="text-2xl font-bold text-white mb-2 relative">Create Account</h2>
-          <p className="text-red-100 relative">Join our blood donor community</p>
+          <h2 className="text-2xl font-bold text-white mb-2 relative">
+            Create Account
+          </h2>
+          <p className="text-red-100 relative">
+            Join our blood donor community
+          </p>
         </motion.div>
 
         {/* Form */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -552,7 +562,9 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Full Name *
+              </label>
               <div className="relative group">
                 <FaUser className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" />
                 <input
@@ -571,7 +583,9 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address *
+              </label>
               <div className="relative group">
                 <FaEnvelope className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" />
                 <input
@@ -590,19 +604,30 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Blood Group *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Blood Group *
+              </label>
               <div className="relative group">
-                <Droplet className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" size={18} />
+                <Droplet
+                  className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors"
+                  size={18}
+                />
                 <select
                   name="blood"
                   required
                   defaultValue=""
                   className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all appearance-none cursor-pointer"
                 >
-                  <option value="" disabled>Select Blood Group</option>
-                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((g) => (
-                    <option key={g} value={g}>{g}</option>
-                  ))}
+                  <option value="" disabled>
+                    Select Blood Group
+                  </option>
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
+                    (g) => (
+                      <option key={g} value={g}>
+                        {g}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
             </motion.div>
@@ -613,9 +638,14 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">District *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                District *
+              </label>
               <div className="relative group">
-                <MapPin className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" size={18} />
+                <MapPin
+                  className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors"
+                  size={18}
+                />
                 <select
                   name="district"
                   required
@@ -628,7 +658,9 @@ const Register = () => {
                 >
                   <option value="">Select District</option>
                   {districts.map((d) => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -640,9 +672,14 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.9 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Upazila *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Upazila *
+              </label>
               <div className="relative group">
-                <MapPin className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" size={18} />
+                <MapPin
+                  className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors"
+                  size={18}
+                />
                 <select
                   name="upazila"
                   required
@@ -655,7 +692,9 @@ const Register = () => {
                   {upazilas
                     .filter((u) => u.district_id === district)
                     .map((u) => (
-                      <option key={u.id} value={u.name}>{u.name}</option>
+                      <option key={u.id} value={u.name}>
+                        {u.name}
+                      </option>
                     ))}
                 </select>
               </div>
@@ -667,7 +706,9 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 1.0 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Password *
+              </label>
               <div className="relative group">
                 <FaLock className="absolute left-4 top-4 text-gray-400 group-focus-within:text-red-600 transition-colors" />
                 <input
@@ -684,7 +725,11 @@ const Register = () => {
                   onClick={togglePasswordVisibility}
                   className="absolute right-4 top-4 text-gray-400 hover:text-red-600 transition-colors"
                 >
-                  {isPasswordVisible ? <IoEyeOff className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+                  {isPasswordVisible ? (
+                    <IoEyeOff className="h-5 w-5" />
+                  ) : (
+                    <FaEye className="h-5 w-5" />
+                  )}
                 </motion.button>
               </div>
             </motion.div>
@@ -695,11 +740,17 @@ const Register = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 1.1 }}
             >
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Profile Image (Optional)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Profile Image (Optional)
+              </label>
               <div className="relative">
                 {imagePreview && (
                   <div className="mb-3 flex justify-center">
-                    <img src={imagePreview} alt="Preview" className="w-24 h-24 rounded-full object-cover border-4 border-red-100" />
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-red-100"
+                    />
                   </div>
                 )}
                 <label className="flex items-center justify-center gap-3 w-full p-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-red-500 hover:bg-red-50 transition-all group">
@@ -732,7 +783,11 @@ const Register = () => {
                 <div className="flex items-center gap-2">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
                     className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   />
                   Creating Account...
@@ -740,14 +795,17 @@ const Register = () => {
               ) : (
                 <>
                   Create Account
-                  <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
+                  <ArrowRight
+                    className="group-hover:translate-x-1 transition-transform"
+                    size={20}
+                  />
                 </>
               )}
             </motion.button>
           </form>
 
           {/* Divider */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 1.3 }}
@@ -757,7 +815,9 @@ const Register = () => {
               <div className="w-full border-t-2 border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">OR</span>
+              <span className="px-4 bg-white text-gray-500 font-medium">
+                OR
+              </span>
             </div>
           </motion.div>
 
@@ -777,7 +837,7 @@ const Register = () => {
           </motion.button>
 
           {/* Sign In Link */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 1.5 }}
