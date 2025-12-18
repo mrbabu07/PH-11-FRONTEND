@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../Firebase/Firebase.config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
