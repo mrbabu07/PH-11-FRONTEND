@@ -821,7 +821,7 @@ const Register = () => {
             </div>
           </motion.div>
 
-          {/* Google Register */}
+          {/* Google Register
           <motion.button
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -834,7 +834,7 @@ const Register = () => {
           >
             <FaGoogle className="text-red-500 text-xl" />
             Continue with Google
-          </motion.button>
+          </motion.button> */}
 
           {/* Sign In Link */}
           <motion.div
